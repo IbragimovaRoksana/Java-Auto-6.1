@@ -37,6 +37,17 @@ public class DashboardPage {
         return Integer.parseInt(value);
     }
 
+    private SelenideElement addToFirst = $$(".list__item .button__text").first();
+    private SelenideElement addToSecond = $$(".list__item .button__text").last();
 
+    public TransferPage addToFirstCard() {
+        addToFirst.click();
+        return new TransferPage();
+    }
+
+    public TransferPage addToSecondCard() {
+        addToSecond.click();
+        return new TransferPage();
+    }
 
 }

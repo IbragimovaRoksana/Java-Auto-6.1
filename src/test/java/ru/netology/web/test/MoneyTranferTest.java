@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.netology.web.data.DataHelper;
 import ru.netology.web.page.DashboardPage;
 import ru.netology.web.page.Login;
+import ru.netology.web.page.TransferPage;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static com.codeborne.selenide.Selectors.withText;
@@ -22,22 +23,20 @@ public class MoneyTranferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         //проверяем подключение к Dashboard и создаем переменную класса DashboardPage для тестов
-        val expected = verificationPage.validVerify(verificationCode);
+        val dashboardPage = verificationPage.validVerify(verificationCode);
         //настройка параметров перевода
-        int BalanceFirstCard=expected.getFirstCardBalance();
-        int BalanceSecondCard=expected.getSecondCardBalance();
-        Integer Transfer=100;
+        val balanceFirstCard = dashboardPage.getFirstCardBalance();
+        val balanceSecondCard = dashboardPage.getSecondCardBalance();
+        Integer transfer = 100;
         //выбираем первую карту
-        $$(".list__item .button__text").first().click();
-        //заполняем поля для перевода
-        $$(".input__control[type=text]").first().setValue(Transfer.toString());
-        $(".input__control[type=tel]").setValue("5559000000000002");
-        $(withText("Пополнить")).click();
+        val transferPage = dashboardPage.addToFirstCard();
+        //переводим средства
+        transferPage.addToFirstCard(transfer);
         //проверяем результат
-        int expectBalanceFirstCard = BalanceFirstCard+Transfer;
-        int expectBalanceSecondCard = BalanceSecondCard-Transfer;
-        assertEquals(expectBalanceFirstCard, expected.getFirstCardBalance());
-        assertEquals(expectBalanceSecondCard, expected.getSecondCardBalance());
+        val expectBalanceFirstCard = balanceFirstCard + transfer;
+        val expectBalanceSecondCard = balanceSecondCard - transfer;
+        assertEquals(expectBalanceFirstCard, dashboardPage.getFirstCardBalance());
+        assertEquals(expectBalanceSecondCard, dashboardPage.getSecondCardBalance());
     }
 
     @Test
@@ -50,22 +49,20 @@ public class MoneyTranferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         //проверяем подключение к Dashboard и создаем переменную класса DashboardPage для тестов
-        val expected = verificationPage.validVerify(verificationCode);
+        val dashboardPage = verificationPage.validVerify(verificationCode);
         //настройка параметров перевода
-        int BalanceFirstCard=expected.getFirstCardBalance();
-        int BalanceSecondCard=expected.getSecondCardBalance();
-        Integer Transfer=100;
-        //выбираем вторую карту
-        $$(".list__item .button__text").last().click();
-        //заполняем поля для перевода
-        $$(".input__control[type=text]").first().setValue(Transfer.toString());
-        $(".input__control[type=tel]").setValue("5559000000000001");
-        $(withText("Пополнить")).click();
+        val balanceFirstCard = dashboardPage.getFirstCardBalance();
+        val balanceSecondCard = dashboardPage.getSecondCardBalance();
+        Integer transfer = 100;
+        //выбираем первую карту
+        val transferPage = dashboardPage.addToSecondCard();
+        //переводим средства
+        transferPage.addToSecondCard(transfer);
         //проверяем результат
-        int expectBalanceFirstCard = BalanceFirstCard-Transfer;
-        int expectBalanceSecondCard = BalanceSecondCard+Transfer;
-        assertEquals(expectBalanceFirstCard, expected.getFirstCardBalance());
-        assertEquals(expectBalanceSecondCard, expected.getSecondCardBalance());
+        val expectBalanceFirstCard = balanceFirstCard - transfer;
+        val expectBalanceSecondCard = balanceSecondCard + transfer;
+        assertEquals(expectBalanceFirstCard, dashboardPage.getFirstCardBalance());
+        assertEquals(expectBalanceSecondCard, dashboardPage.getSecondCardBalance());
     }
 
     @Test
@@ -78,22 +75,46 @@ public class MoneyTranferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         //проверяем подключение к Dashboard и создаем переменную класса DashboardPage для тестов
-        val expected = verificationPage.validVerify(verificationCode);
+        val dashboardPage = verificationPage.validVerify(verificationCode);
         //настройка параметров перевода
-        int BalanceFirstCard=expected.getFirstCardBalance();
-        int BalanceSecondCard=expected.getSecondCardBalance();
-        Integer Transfer=100;
+        val balanceFirstCard = dashboardPage.getFirstCardBalance();
+        val balanceSecondCard = dashboardPage.getSecondCardBalance();
+        Integer transfer = 100;
         //выбираем первую карту
-        $$(".list__item .button__text").first().click();
-        //заполняем поля для перевода
-        $$(".input__control[type=text]").first().setValue(Transfer.toString());
-        $(".input__control[type=tel]").setValue("5559000000000002");
-        $(withText("Отмена")).click();
+        val transferPage = dashboardPage.addToSecondCard();
+        //переводим средства
+        transferPage.abordToSecondCard(transfer);
         //проверяем результат
-        int expectBalanceFirstCard = BalanceFirstCard;
-        int expectBalanceSecondCard = BalanceSecondCard;
-        assertEquals(expectBalanceFirstCard, expected.getFirstCardBalance());
-        assertEquals(expectBalanceSecondCard, expected.getSecondCardBalance());
+        val expectBalanceFirstCard = balanceFirstCard;
+        val expectBalanceSecondCard = balanceSecondCard;
+        assertEquals(expectBalanceFirstCard, dashboardPage.getFirstCardBalance());
+        assertEquals(expectBalanceSecondCard, dashboardPage.getSecondCardBalance());
+    }
+
+    @Test
+    void shouldAbortButtonFromSecondToFirst() {
+        //подключаемся к серверу
+        open("http://localhost:9999");
+        //логинимся
+        val loginPage = new Login();
+        val authInfo = DataHelper.getAuthInfo();
+        val verificationPage = loginPage.validLogin(authInfo);
+        val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        //проверяем подключение к Dashboard и создаем переменную класса DashboardPage для тестов
+        val dashboardPage = verificationPage.validVerify(verificationCode);
+        //настройка параметров перевода
+        val balanceFirstCard = dashboardPage.getFirstCardBalance();
+        val balanceSecondCard = dashboardPage.getSecondCardBalance();
+        Integer transfer = 100;
+        //выбираем первую карту
+        val transferPage = dashboardPage.addToFirstCard();
+        //переводим средства
+        transferPage.abordToFirstCard(transfer);
+        //проверяем результат
+        val expectBalanceFirstCard = balanceFirstCard;
+        val expectBalanceSecondCard = balanceSecondCard;
+        assertEquals(expectBalanceFirstCard, dashboardPage.getFirstCardBalance());
+        assertEquals(expectBalanceSecondCard, dashboardPage.getSecondCardBalance());
     }
 
     @Test
@@ -106,22 +127,46 @@ public class MoneyTranferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         //проверяем подключение к Dashboard и создаем переменную класса DashboardPage для тестов
-        val expected = verificationPage.validVerify(verificationCode);
+        val dashboardPage = verificationPage.validVerify(verificationCode);
         //настройка параметров перевода
-        int BalanceFirstCard=expected.getFirstCardBalance();
-        int BalanceSecondCard=expected.getSecondCardBalance();
-        Integer Transfer=11000;
+        val balanceFirstCard = dashboardPage.getFirstCardBalance();
+        val balanceSecondCard = dashboardPage.getSecondCardBalance();
+        Integer transfer = 11000;
         //выбираем первую карту
-        $$(".list__item .button__text").first().click();
-        //заполняем поля для перевода
-        $$(".input__control[type=text]").first().setValue(Transfer.toString());
-        $(".input__control[type=tel]").setValue("5559000000000002");
-        $(withText("Пополнить")).click();
+        val transferPage = dashboardPage.addToFirstCard();
+        //переводим средства
+        transferPage.addToFirstCard(transfer);
         //проверяем результат
-        int expectBalanceFirstCard = BalanceFirstCard;
-        int expectBalanceSecondCard = BalanceSecondCard;
-        assertEquals(expectBalanceFirstCard, expected.getFirstCardBalance());
-        assertEquals(expectBalanceSecondCard, expected.getSecondCardBalance());
+        val expectBalanceFirstCard = balanceFirstCard;
+        val expectBalanceSecondCard = balanceSecondCard;
+        assertEquals(expectBalanceFirstCard, dashboardPage.getFirstCardBalance());
+        assertEquals(expectBalanceSecondCard, dashboardPage.getSecondCardBalance());
+    }
+
+    @Test
+    void shouldNotTransferMoneyFromSecondToFirst() {
+        //подключаемся к серверу
+        open("http://localhost:9999");
+        //логинимся
+        val loginPage = new Login();
+        val authInfo = DataHelper.getAuthInfo();
+        val verificationPage = loginPage.validLogin(authInfo);
+        val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        //проверяем подключение к Dashboard и создаем переменную класса DashboardPage для тестов
+        val dashboardPage = verificationPage.validVerify(verificationCode);
+        //настройка параметров перевода
+        val balanceFirstCard = dashboardPage.getFirstCardBalance();
+        val balanceSecondCard = dashboardPage.getSecondCardBalance();
+        Integer transfer = 11000;
+        //выбираем первую карту
+        val transferPage = dashboardPage.addToSecondCard();
+        //переводим средства
+        transferPage.addToSecondCard(transfer);
+        //проверяем результат
+        val expectBalanceFirstCard = balanceFirstCard;
+        val expectBalanceSecondCard = balanceSecondCard;
+        assertEquals(expectBalanceFirstCard, dashboardPage.getFirstCardBalance());
+        assertEquals(expectBalanceSecondCard, dashboardPage.getSecondCardBalance());
     }
 
 }

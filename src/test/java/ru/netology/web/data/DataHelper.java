@@ -4,7 +4,8 @@ import lombok.Value;
 
 public class DataHelper {
 
-    private DataHelper() {}
+    private DataHelper() {
+    }
 
     @Value
     public static class AuthInfo {
@@ -25,7 +26,18 @@ public class DataHelper {
         private String code;
     }
 
-    public static VerificationCode getVerificationCodeFor(AuthInfo authInfo) { return new VerificationCode("12345");
+    public static VerificationCode getVerificationCodeFor(AuthInfo authInfo) {
+        return new VerificationCode("12345");
+    }
+
+    public static String getNumberOfFirstCard() {
+        String s = "5559000000000001";
+        return s;
+    }
+
+    public static String getNumberOfSecondCard() {
+        String s = "5559000000000002";
+        return s;
     }
 
 }
